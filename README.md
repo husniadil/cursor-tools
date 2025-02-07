@@ -2,6 +2,8 @@
   <img height="72" src="https://github.com/user-attachments/assets/45eff178-242f-4d84-863e-247b080cc6f5" />
 </div>
 
+> This is a fork of [eastlondoner/cursor-tools](https://github.com/eastlondoner/cursor-tools) with OpenRouter integration for providing one-stop service.
+
 <div align=center><h1>Give Cursor Agent an AI team and advanced skills</h1></div>
 
 ### The AI Team
