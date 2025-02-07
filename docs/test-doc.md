@@ -30,8 +30,7 @@
 - **Manual Setup:** Create `.cursor-tools.env` in your project root or `~/.cursor-tools/.env` in your home directory.
 
    ```env
-   PERPLEXITY_API_KEY="your-perplexity-api-key"
-   GEMINI_API_KEY="your-gemini-api-key"
+   OPENROUTER_API_KEY="your-perplexity-api-key"
    ```
 
 ### Default Settings
@@ -41,11 +40,11 @@ Customize settings in `cursor-tools.config.json` in your project root or `~/.cur
 ```json
 {
   "perplexity": {
-    "model": "sonar-pro",
+    "model": "perplexity/sonar",
     "maxTokens": 8000
   },
   "gemini": {
-    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "model": "google/gemini-2.0-flash-001",
     "maxTokens": 10000
   },
   "doc": {
@@ -64,7 +63,7 @@ Performs web searches using Perplexity AI.
 
 ```bash
 cursor-tools web "What is the latest version of React?"
-cursor-tools web --model sonar-pro "Explain quantum computing"
+cursor-tools web --model perplexity/sonar "Explain quantum computing"
 cursor-tools web "How do I use fetch in JavaScript?" --max-tokens 500 --save-to output.txt
 ```
 
@@ -103,8 +102,8 @@ Generates documentation for a repository.
 ```bash
 cursor-tools doc # Documents local repository to stdout
 cursor-tools doc --output docs.md # Documents local repo, saves to docs.md
-cursor-tools doc --from-github eastlondoner/cursor-tools # Documents remote GitHub repo to stdout
-cursor-tools doc --from-github eastlondoner/cursor-tools@main --output cursor-tools-docs.md # Remote repo, branch and output file.
+cursor-tools doc --from-github husniadil/cursor-tools # Documents remote GitHub repo to stdout
+cursor-tools doc --from-github husniadil/cursor-tools@main --output cursor-tools-docs.md # Remote repo, branch and output file.
 cursor-tools doc --hint "Focus on the public API" --output api-docs.md # With hint
 ```
 

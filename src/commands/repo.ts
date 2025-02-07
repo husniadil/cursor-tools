@@ -12,14 +12,14 @@ export class RepoCommand implements Command {
     this.config = loadConfig();
   }
 
-  private async fetchGeminiResponse(
+  private async fetchOpenRouterResponse(
     query: string,
     repoContext: string,
     options?: CommandOptions
   ): Promise<string> {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is not set');
+      throw new Error('OPENROUTER_API_KEY environment variable is not set');
     }
 
     let cursorRules = '';
@@ -29,37 +29,40 @@ export class RepoCommand implements Command {
       // Ignore if .cursorrules doesn't exist
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${options?.model || this.config.gemini.model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: cursorRules }, { text: repoContext }, { text: query }],
-            },
-          ],
-          generationConfig: {
-            maxOutputTokens: options?.maxTokens || this.config.gemini.maxTokens,
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'HTTP-Referer': 'https://github.com/husniadil/cursor-tools',
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: options?.model || this.config.gemini.model,
+        messages: [
+          {
+            role: 'system',
+            content: cursorRules,
           },
-        }),
-      }
-    );
+          {
+            role: 'user',
+            content: repoContext + '\n\n' + query,
+          },
+        ],
+        max_tokens: options?.maxTokens || this.config.gemini.maxTokens,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+      throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
     if (data.error) {
-      throw new Error(`Gemini API error: ${JSON.stringify(data.error, null, 2)}`);
+      throw new Error(`OpenRouter API error: ${JSON.stringify(data.error, null, 2)}`);
     }
 
-    return data.candidates[0].content.parts[0].text;
+    return data.choices[0].message.content;
   }
 
   async *execute(query: string, options?: CommandOptions): CommandGenerator {
@@ -89,8 +92,8 @@ export class RepoCommand implements Command {
       const repoContext = readFileSync('.repomix-output.txt', 'utf-8');
 
       const model = options?.model || this.config.gemini.model;
-      yield `Querying Gemini AI using ${model}...\n`;
-      const response = await this.fetchGeminiResponse(query, repoContext, options);
+      yield `Querying OpenRouter AI using ${model}...\n`;
+      const response = await this.fetchOpenRouterResponse(query, repoContext, options);
       yield response;
     } catch (error) {
       if (error instanceof Error) {

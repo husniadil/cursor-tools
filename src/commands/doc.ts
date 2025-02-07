@@ -179,33 +179,16 @@ export class DocCommand implements Command {
     throw new Error('Failed to fetch GitHub repository context after all retries');
   }
 
-  private async fetchGeminiDocResponse(
+  private async fetchOpenRouterDocResponse(
     repoContext: { text: string; tokenCount: number },
     options?: DocCommandOptions
   ): Promise<string> {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is not set');
+      throw new Error('OPENROUTER_API_KEY environment variable is not set');
     }
 
-    // Use actual token count from repomix
-    const tokenCount = repoContext.tokenCount;
-    let model = options?.model || this.config.gemini.model;
-
-    if (tokenCount > 800_000 && tokenCount < 2_000_0000) {
-      console.error(
-        `Repository content is large (${Math.round(tokenCount / 1000)}K tokens), switching to gemini-2.0-pro-exp-02-05 model...`
-      );
-      model = 'gemini-2.0-pro-exp-02-05';
-    } else if (tokenCount >= 2_000_0000) {
-      throw new Error(
-        `Repository content is too large (${Math.round(tokenCount / 1000)}K tokens) for Gemini API.\n` +
-          `Please try:\n` +
-          `1. Using a more specific query to document a particular feature or module\n` +
-          `2. Running the documentation command on a specific directory or file\n` +
-          `3. Cloning the repository locally and using .gitignore to exclude non-essential files`
-      );
-    }
+    const model = options?.model || this.config.gemini.model;
 
     // Define a prompt for Gemini to generate documentation
     let query = `
@@ -224,46 +207,42 @@ Focus on:
       query += `\n\nAdditional guidance:\n${options.hint}`;
     }
 
-    console.error('Using Gemini model:', model);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [
-              {
-                text: 'You are a helpful assistant that generates public user-facing documentation for a given repository. You will be given a repository context and possibly a query to create docs for a specific part or function, if this is not provided generate docs for all public interfaces and features. Generate a comprehensive documentation with all necessary information BUT stick to short simple sentences and avoid being wordy, verbose or making a sales-pitch, stick to factual statements and be concise. Format the documentation in markdown unless otherwise specified.',
-              },
-            ],
+    console.error('Using OpenRouter model:', model);
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'HTTP-Referer': 'https://github.com/husniadil/cursor-tools',
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a helpful assistant that generates public user-facing documentation for a given repository. You will be given a repository context and possibly a query to create docs for a specific part or function, if this is not provided generate docs for all public interfaces and features. Generate a comprehensive documentation with all necessary information BUT stick to short simple sentences and avoid being wordy, verbose or making a sales-pitch, stick to factual statements and be concise. Format the documentation in markdown unless otherwise specified.',
           },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: repoContext.text }, { text: query }],
-            },
-          ],
-          generationConfig: {
-            maxOutputTokens: options?.maxTokens || this.config.gemini.maxTokens,
+          {
+            role: 'user',
+            content: repoContext.text + '\n\n' + query,
           },
-        }),
-      }
-    );
+        ],
+        max_tokens: options?.maxTokens || this.config.gemini.maxTokens,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${errorText}`);
+      throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
     if (data.error) {
-      throw new Error(`Gemini API error: ${JSON.stringify(data.error, null, 2)}`);
+      throw new Error(`OpenRouter API error: ${JSON.stringify(data.error, null, 2)}`);
     }
 
-    return data.candidates[0].content.parts[0].text;
+    return data.choices[0].message.content;
   }
 
   async *execute(query: string, options?: DocCommandOptions): CommandGenerator {
@@ -301,8 +280,8 @@ Focus on:
         repoContext = { text: readFileSync(tempFile, 'utf-8'), tokenCount: 0 };
       }
 
-      console.error('Generating documentation using Gemini AI...\n');
-      const documentation = await this.fetchGeminiDocResponse(repoContext, options);
+      console.error('Generating documentation using OpenRouter AI...\n');
+      const documentation = await this.fetchOpenRouterDocResponse(repoContext, options);
 
       // Save to file if output option is provided
       if (options?.output) {

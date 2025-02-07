@@ -17,9 +17,9 @@ export class WebCommand implements Command {
     query: string,
     options?: CommandOptions
   ): AsyncGenerator<string, void, unknown> {
-    const apiKey = process.env.PERPLEXITY_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      throw new Error('PERPLEXITY_API_KEY environment variable is not set');
+      throw new Error('OPENROUTER_API_KEY environment variable is not set');
     }
 
     let maxRetriesReached = false;
@@ -28,22 +28,19 @@ export class WebCommand implements Command {
 
     let fetchAttempts = 0;
     const es = createEventSource({
-      url: 'https://api.perplexity.ai/chat/completions',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
       onDisconnect: () => {
         if (endMessageReceived) {
           return;
         }
         if (someMessageReceived) {
-          // This is supposed to happen but perplexity doesn't always send a finish_reason so we have to assume it's the end of the stream
-          // this is not ideal because it could be a network problem we should retry
           console.error(
-            '\nPerplexity disconnected without sending a finish_reason, we will close the connection'
+            '\nOpenRouter disconnected without sending a finish_reason, we will close the connection'
           );
           es.close();
         } else {
-          // no messages were received so we should retry
           console.error(
-            `\nConnection disconnected without recieving any messages, we will retry ${MAX_RETRIES} times (attempt ${fetchAttempts})`
+            `\nConnection disconnected without receiving any messages, we will retry ${MAX_RETRIES} times (attempt ${fetchAttempts})`
           );
           es.close();
         }
@@ -52,7 +49,6 @@ export class WebCommand implements Command {
         if (fetchAttempts++ > MAX_RETRIES) {
           maxRetriesReached = true;
           console.error('\nMax retries reached. Giving up.');
-          // we're going to fake a response to stop the event source from trying to reconnect
           return {
             body: null,
             url: url.toString(),
@@ -65,6 +61,7 @@ export class WebCommand implements Command {
           method: 'POST',
           headers: {
             ...(init?.headers || {}),
+            'HTTP-Referer': 'https://github.com/husniadil/cursor-tools',
             Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
             Accept: 'application/json',
@@ -89,7 +86,7 @@ export class WebCommand implements Command {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Perplexity API error', errorText);
+          console.error('OpenRouter API error', errorText);
           throw new Error(`API Error (${response.status}): ${errorText}`);
         }
 

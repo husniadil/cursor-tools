@@ -32,11 +32,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eastlondoner/cursor-tools.git"
+    "url": "git+https://github.com/husniadil/cursor-tools.git"
   },
-  "homepage": "https://github.com/eastlondoner/cursor-tools#readme",
+  "homepage": "https://github.com/husniadil/cursor-tools#readme",
   "bugs": {
-    "url": "https://github.com/eastlondoner/cursor-tools/issues"
+    "url": "https://github.com/husniadil/cursor-tools/issues"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

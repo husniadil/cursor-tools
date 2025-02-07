@@ -32,13 +32,13 @@ export class InstallCommand implements Command {
     const localEnvPath = join(process.cwd(), '.cursor-tools.env');
 
     // Check if keys are already set
-    if (process.env.PERPLEXITY_API_KEY && process.env.GEMINI_API_KEY) {
+    if (process.env.OPENROUTER_API_KEY) {
       return;
     }
 
     // Function to write keys to a file
-    const writeKeysToFile = (filePath: string, perplexityKey: string, geminiKey: string) => {
-      const envContent = `PERPLEXITY_API_KEY=${perplexityKey}\nGEMINI_API_KEY=${geminiKey}\n`;
+    const writeKeysToFile = (filePath: string, openRouterApiKey: string) => {
+      const envContent = `OPENROUTER_API_KEY=${openRouterApiKey}\n`;
       const dir = join(filePath, '..');
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });
@@ -48,34 +48,20 @@ export class InstallCommand implements Command {
 
     // Try to write to home directory first, fall back to local if it fails
     try {
-      const perplexityKey = process.env.PERPLEXITY_API_KEY || '';
-      const geminiKey = process.env.GEMINI_API_KEY || '';
+      const openRouterKey = process.env.OPENROUTER_API_KEY || '';
 
-      if (!perplexityKey) {
-        const key = await getUserInput('Enter your Perplexity API key (or press Enter to skip): ');
-        process.env.PERPLEXITY_API_KEY = key;
-      }
-
-      if (!geminiKey) {
-        const key = await getUserInput('Enter your Gemini API key (or press Enter to skip): ');
-        process.env.GEMINI_API_KEY = key;
+      if (!openRouterKey) {
+        const key = await getUserInput('Enter your OpenRouter API key (or press Enter to skip): ');
+        process.env.OPENROUTER_API_KEY = key;
       }
 
       try {
-        writeKeysToFile(
-          homeEnvPath,
-          process.env.PERPLEXITY_API_KEY || '',
-          process.env.GEMINI_API_KEY || ''
-        );
+        writeKeysToFile(homeEnvPath, process.env.OPENROUTER_API_KEY || '');
         yield 'API keys written to ~/.cursor-tools/.env\n';
       } catch (error) {
         console.error('Error writing API keys to home directory:', error);
         // Fall back to local file if home directory write fails
-        writeKeysToFile(
-          localEnvPath,
-          process.env.PERPLEXITY_API_KEY || '',
-          process.env.GEMINI_API_KEY || ''
-        );
+        writeKeysToFile(localEnvPath, process.env.OPENROUTER_API_KEY || '');
         yield 'API keys written to .cursor-tools.env in the current directory\n';
       }
     } catch (error) {

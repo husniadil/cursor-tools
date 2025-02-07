@@ -1,134 +1,227 @@
 
 --- Repository Documentation ---
 
+```markdown
+--- Repository Documentation ---
+
 # Cursor Tools Documentation
 
 ## Repository Purpose and Summary
 
-`cursor-tools` enhances AI-powered development agents and IDEs. It provides AI-powered web queries and codebase understanding. It integrates with Cursor and other agents using Perplexity AI for web searches and Google Gemini for repository-aware assistance. It's an npm package with a CLI to extend agent capabilities.
+`cursor-tools` enhances AI-powered development workflows. It provides a CLI for web queries, repo context, and documentation generation using Perplexity AI and Google Gemini.
 
 ## Quick Start
 
 1.  **Installation:**
 
-    Run this interactive setup in your project's root directory:
+    Run:
+
     ```bash
     npx cursor-tools@latest install .
     ```
+
     This installs `cursor-tools`, configures API keys, and updates `.cursorrules`.
-
-2.  **Basic Usage:**
-
-    *   **Web Search (Perplexity AI):**
-
-        ```bash
-        cursor-tools web "Your question here"
-        ```
-
-    *   **Repository Context (Google Gemini):**
-
-        ```bash
-        cursor-tools repo "Your question about the codebase"
-        ```
-    If it is not globally installed you can use:
-
+2.  **Perplexity Search**
     ```bash
-     npx -y cursor-tools@latest web "query"
+    cursor-tools web "query"
+    ```
+3.  **Repository Context**
+    ```bash
+    cursor-tools repo "query"
+    ```
+4.  **Documentation Generation**
+    ```bash
+    cursor-tools doc
     ```
 
 ## Configuration
 
 ### API Keys
 
-`cursor-tools` needs API keys for Perplexity AI and Google Gemini. Set them up using:
+`cursor-tools` requires API keys for Perplexity AI and Google Gemini.
 
 1.  **Interactive Setup**: `cursor-tools install` guides you through the process.
-
 2.  **Manual Setup**: Create `.cursor-tools.env` in your project root, or `~/.cursor-tools/.env` in home directory:
 
     ```
-    PERPLEXITY_API_KEY="your-perplexity-api-key"
-    GEMINI_API_KEY="your-gemini-api-key"
+    OPENROUTER_API_KEY="your-perplexity-api-key"
     ```
 
 ### Default Settings
 
-Customize with `cursor-tools.config.json`:
+Customize `cursor-tools` behavior by creating a `cursor-tools.config.json` file in the project root or `~/.cursor-tools/.env` in your home directory.
+
 ```json
 {
-  "perplexity": {
-    "model": "sonar-pro",
-    "maxTokens": 8000
-  },
-  "gemini": {
-    "model": "gemini-2.0-flash-thinking-exp-01-21",
-    "maxTokens": 10000
-  }
+    "perplexity": {
+        "model": "perplexity/sonar",
+        "maxTokens": 8000
+    },
+    "gemini": {
+        "model": "google/gemini-2.0-flash-001",
+        "maxTokens": 10000
+    },
+    "doc": {
+        "maxRepoSizeMB": 100
+    },
+    "tokenCount": {
+        "encoding": "o200k_base"
+    },
+    "browser": {
+        "headless": true,
+        "defaultViewport": "1280x720",
+        "timeout": 30000
+    }
 }
 ```
 
-## Core Features
+## Core Features / API / Interfaces
 
-### Web Search
+### 1. `web` Command
 
-Get current web info:
+Performs web searches using Perplexity AI.
 
-```bash
-cursor-tools web "What's new in TypeScript 5.7?"
-```
-
-### Repository Context
-
-Get codebase-aware answers:
+**Usage:**
 
 ```bash
-cursor-tools repo "Explain the authentication flow."
+cursor-tools web "What is the latest version of React?"
 ```
 
-### Documentation Generation
-Create docs for your repository or a GitHub repo:
+**Options:**
+
+-   `--model`: Perplexity model name.
+-   `--maxTokens`: Maximum tokens in response.
+-   `--saveTo`: Path to save output.
+-   `--hint`: Additional context for AI.
+
+### 2. `repo` Command
+
+Provides context-aware answers about the current repository using Google Gemini.
+
+**Usage:**
 
 ```bash
-# Local
-cursor-tools doc "Generate documentation"
-
-# Remote GitHub repo
-cursor-tools doc "Generate documentation" --fromGithub=username/repo-name
-cursor-tools doc "Generate documentation" --fromGithub=username/repo-name@branch # Specific branch
-
-# Save to file
-cursor-tools doc "Generate documentation" --output=docs/README.md
+cursor-tools repo "Explain the purpose of the src/config.ts file"
 ```
 
-### Command Options
-*   `--model`: Choose a different model.
-*   `--maxTokens`: Set the maximum response length.
-*   `--help`: All available options.
-*   `--fromGithub`: Generate docs from a remote GitHub repository (For documentation).
-*    `--output`: Save the documentation to a specified file (For documentation).
+**Options:**
 
-## Cursor Integration
+-   `--model`: Gemini model name.
+-   `--maxTokens`: Maximum tokens in response.
+-   `--saveTo`: Path to save output.
+-   `--hint`: Additional context for AI.
 
-`cursor-tools` sets up Cursor by changing `.cursorrules` on installation. This provides command suggestions and context-aware help.
+### 3. `doc` Command
 
-Use Cursor agent in "yolo mode."
+Generates documentation for a repository.
 
-## Troubleshooting
+**Usage:**
 
-### Common Issues
+```bash
+cursor-tools doc
+```
 
-1.  **Command Not Found:**
-    *   Install `cursor-tools` (globally or as dev dependency).
-    *   Check your PATH if globally installed.
+**Options:**
 
-2.  **API Key Errors:**
-    *   Make sure `.cursor-tools.env` file exists and has correct API keys.
-    *   Run `cursor-tools install` again to set up the API keys.
+-   `--output`: Output file path.
+-   `--fromGithub`: GitHub URL or `username/reponame[@branch]`.
+-   `--model`: Gemini model name.
+-   `--maxTokens`: Maximum tokens in response.
+-   `--hint`: Additional context for AI.
 
-3.  **Model Errors:**
-    *   Check internet connection.
-    *   Check API key permissions.
-    *   Make sure the model is available for your API tier.
+#### Remote Repository Documentation
 
+The `doc` command supports documenting remote GitHub repositories:
+
+```bash
+cursor-tools doc --from-github husniadil/cursor-tools
+```
+
+### 4. `github` Command
+
+Accesses information from GitHub (pull requests and issues).
+
+**Subcommands:**
+
+-   `pr`: Pull requests.
+    **Usage**:
+
+    ```bash
+    cursor-tools github pr
+    ```
+-   `issue`: Issues.
+    **Usage**:
+
+    ```bash
+    cursor-tools github issue
+    ```
+
+**Options:**
+
+-   `--fromGithub`: GitHub `username/reponame`.
+-   `--repo`: GitHub `username/reponame` (alternative to `--fromGithub`).
+
+### 5. `browser` command
+
+Provides web automation capabilities via Playwright. Requires separate installation:
+
+```bash
+npm install playwright
+```
+
+**Subcommands:**
+
+-   `open`: Opens a URL and captures page content.
+    **Usage**:
+
+    ```bash
+    cursor-tools browser open "https://example.com" --html
+    ```
+-   `element`: Inspects a specific element on the page.
+    **Usage**:
+
+    ```bash
+    cursor-tools browser element --url "https://example.com" --selector "#product-title" --text
+    ```
+
+### 6. `install` Command
+
+Installs `cursor-tools` and configures API keys and `.cursorrules`.
+
+**Usage:**
+
+```bash
+npx cursor-tools@latest install .
+```
+
+## GitHub Authentication
+
+The `github` command supports these authentication methods:
+
+1.  `GITHUB_TOKEN` environment variable.
+2.  GitHub CLI (`gh`).
+3.  Git Credentials.
+
+Unauthenticated access has lower rate limits.
+
+## Dependencies
+
+-   Node.js 18 or later
+-   Perplexity API key
+-   Google Gemini API key
+-   `dotenv`
+-   `eventsource-client`
+-   `repomix`
+-   `playwright` (peer dependency)
+
+## Advanced Usage Examples
+
+-   Combine commands for complex tasks.
+-   Use hints for iterative refinement.
+-   Automate documentation updates.
+-   Integrate with GitHub Actions for documentation workflows.
+
+--- End of Documentation ---
+```
 
 --- End of Documentation ---

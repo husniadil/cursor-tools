@@ -1,4 +1,4 @@
-Querying Perplexity AI using sonar-pro for: How can I connect to an already running Chrome window or instance using Playwright?
+Querying Perplexity AI using perplexity/sonar for: How can I connect to an already running Chrome window or instance using Playwright?
 To connect Playwright to an already running Chrome instance:
 
 1. Launch Chrome with remote debugging enabled:

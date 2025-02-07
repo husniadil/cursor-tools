@@ -1,4 +1,4 @@
-Querying Perplexity AI using sonar-pro for: How can I fetch and handle javascript console logs when using Playwright for browser automation?
+Querying Perplexity AI using perplexity/sonar for: How can I fetch and handle javascript console logs when using Playwright for browser automation?
 To fetch and handle JavaScript console logs with Playwright:
 
 1. Use the `page.on('console')` event listener to capture console messages:

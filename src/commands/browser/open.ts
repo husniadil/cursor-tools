@@ -43,7 +43,9 @@ function parseWaitParameter(wait: string): { type: 'time' | 'selector'; value: s
   if (wait.startsWith('time:')) {
     const duration = parseTimeDuration(wait.slice(5));
     if (duration === null) {
-      throw new Error(`Invalid time duration format: ${wait}. Expected format: time:Xs, time:Xms, or time:Xm`);
+      throw new Error(
+        `Invalid time duration format: ${wait}. Expected format: time:Xs, time:Xms, or time:Xm`
+      );
     }
     return { type: 'time', value: duration };
   }
@@ -90,7 +92,9 @@ async function formatConsoleMessage(msg: any): Promise<string> {
   if (type === 'error') {
     try {
       const args = await Promise.all(msg.args().map((arg: any) => arg.jsonValue()));
-      const errorDetails = args.find((arg: unknown) => arg && typeof arg === 'object' && 'stack' in arg);
+      const errorDetails = args.find(
+        (arg: unknown) => arg && typeof arg === 'object' && 'stack' in arg
+      );
       if (errorDetails?.stack) {
         formattedMsg += `\n${errorDetails.stack}`;
       }
@@ -142,7 +146,10 @@ export class OpenCommand implements Command {
         } else {
           yield 'Launching browser...';
           browser = await browserType.launch({
-            headless: options.headless !== undefined ? options.headless : this.config.browser?.headless ?? true,
+            headless:
+              options.headless !== undefined
+                ? options.headless
+                : (this.config.browser?.headless ?? true),
           });
         }
 
@@ -150,27 +157,30 @@ export class OpenCommand implements Command {
         const context = await browser.newContext({
           serviceWorkers: 'allow',
           extraHTTPHeaders: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-          }
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+          },
         });
         const page = await context.newPage();
 
         // Set up route interception before anything else
         if (options.network === true) {
-          await page.route('**/*', async route => {
+          await page.route('**/*', async (route) => {
             const request = route.request();
-            networkMessages.push(`Network Request: ${request.method()} ${request.url()} (${request.resourceType()})`);
-            
+            networkMessages.push(
+              `Network Request: ${request.method()} ${request.url()} (${request.resourceType()})`
+            );
+
             try {
               const response = await route.fetch();
               const status = response.status();
               let message = `Network Response: ${status}`;
-              
+
               // Add status text for non-200 responses
               if (status !== 200) {
                 message += ` (${response.statusText()})`;
               }
-              
+
               message += ` ${response.url()}`;
 
               // For failed responses (4xx, 5xx), try to get the response body
@@ -211,13 +221,15 @@ export class OpenCommand implements Command {
         // Set up error handling and monitoring only if console output is enabled
         if (options.console === true) {
           // Listen for all console messages
-          page.on('console', async msg => {
+          page.on('console', async (msg) => {
             consoleMessages.push(await formatConsoleMessage(msg));
           });
 
           // Listen for page errors
-          page.on('pageerror', error => {
-            consoleMessages.push(`Browser Console (error): Uncaught ${error.message}\n${error.stack || ''}`);
+          page.on('pageerror', (error) => {
+            consoleMessages.push(
+              `Browser Console (error): Uncaught ${error.message}\n${error.stack || ''}`
+            );
           });
         }
 
@@ -229,11 +241,14 @@ export class OpenCommand implements Command {
           try {
             const waitConfig = parseWaitParameter(options.wait);
             yield `Waiting for ${waitConfig.type === 'time' ? `${waitConfig.value}ms` : `selector "${waitConfig.value}"`}...`;
-            
+
             if (waitConfig.type === 'time') {
               await page.waitForTimeout(waitConfig.value as number);
             } else {
-              await page.waitForSelector(waitConfig.value as string, { state: 'visible', timeout: options.timeout ?? this.config.browser?.timeout ?? 30000 });
+              await page.waitForSelector(waitConfig.value as string, {
+                state: 'visible',
+                timeout: options.timeout ?? this.config.browser?.timeout ?? 30000,
+              });
             }
           } catch (error) {
             yield `Wait error: ${error instanceof Error ? error.message : 'Unknown error'}\n`;
@@ -271,7 +286,6 @@ export class OpenCommand implements Command {
           await page.screenshot({ path: options.screenshot, fullPage: true });
           yield 'Screenshot saved.\n';
         }
-
       } catch (error) {
         yield `Browser command error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       } finally {

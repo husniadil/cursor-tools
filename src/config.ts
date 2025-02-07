@@ -24,11 +24,11 @@ export interface Config {
 
 export const defaultConfig: Config = {
   perplexity: {
-    model: 'sonar-pro',
+    model: 'perplexity/sonar',
     maxTokens: 4000,
   },
   gemini: {
-    model: 'gemini-2.0-flash-thinking-exp-01-21',
+    model: 'google/gemini-2.0-flash-001',
     maxTokens: 10000,
   },
   doc: {

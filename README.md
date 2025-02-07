@@ -40,7 +40,7 @@ Here are two examples:
     </details>
   </details>
     see the spec composer and perplexity produced together:
-    <a href="https://github.com/eastlondoner/pac-man/blob/main/specs/pac-man-spec.md">pac-man-spec.md</a> (link out to the example repo)
+    <a href="https://github.com/husniadil/pac-man/blob/main/specs/pac-man-spec.md">pac-man-spec.md</a> (link out to the example repo)
   <br/>
   <br/>
   </div>
@@ -67,7 +67,7 @@ Here are two examples:
     </details>
   </details>
     see the spec composer and perplexity produced together:
-    <a href="https://github.com/eastlondoner/pac-man/blob/main/specs/pac-man-plan.md">pac-man-plan.md</a> (link out to the example repo)
+    <a href="https://github.com/husniadil/pac-man/blob/main/specs/pac-man-plan.md">pac-man-plan.md</a> (link out to the example repo)
   <br/>
   <br/>
   </div>
@@ -107,7 +107,7 @@ This command will:
 
 ## Additional Examples
 
-To see cursor-tools GitHub and Perplexity skills: Check out [this example issue that was solved using Cursor agent and cursor-tools](https://github.com/eastlondoner/cursor-tools/issues/1)
+To see cursor-tools GitHub and Perplexity skills: Check out [this example issue that was solved using Cursor agent and cursor-tools](https://github.com/husniadil/cursor-tools/issues/1)
 
 Tips:
 
@@ -150,8 +150,7 @@ Note: in most cases you can say "fetch issue 123" or "fetch PR 321" instead of "
 1. **Interactive Setup**: Run `cursor-tools install` and follow the prompts
 2. **Manual Setup**: Create `~/.cursor-tools/.env` in your home directory or `.cursor-tools.env` in your project root:
    ```env
-   PERPLEXITY_API_KEY="your-perplexity-api-key"
-   GEMINI_API_KEY="your-gemini-api-key"
+   OPENROUTER_API_KEY="your-perplexity-api-key"
    ```
 
 
@@ -225,8 +224,8 @@ cursor-tools doc --from-github=https://github.com/username/repo-name@branch  # H
 
 # Save documentation to file
 # This is really useful to generate local documentation for libraries and dependencies
-cursor-tools doc --from-github=eastlondoner/cursor-tools --save-to=docs/CURSOR-TOOLS.md
-cursor-tools doc --from-github=eastlondoner/cursor-tools --save-to=docs/CURSOR-TOOLS.md --hint="only information about the doc command"
+cursor-tools doc --from-github=husniadil/cursor-tools --save-to=docs/CURSOR-TOOLS.md
+cursor-tools doc --from-github=husniadil/cursor-tools --save-to=docs/CURSOR-TOOLS.md --hint="only information about the doc command"
 ```
 
 
@@ -268,11 +267,11 @@ Customize `cursor-tools` behavior by creating a `cursor-tools.config.json` file:
 ```json
 {
   "perplexity": {
-    "model": "sonar-pro",
+    "model": "perplexity/sonar",
     "maxTokens": 8000
   },
   "gemini": {
-    "model": "gemini-2.0-flash-thinking-exp-01-21",
+    "model": "google/gemini-2.0-flash-001",
     "maxTokens": 10000
   },
   "tokenCount": {

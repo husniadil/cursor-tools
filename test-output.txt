@@ -1,4 +1,4 @@
-Querying Perplexity AI using sonar-pro for: What is TypeScript?
+Querying Perplexity AI using perplexity/sonar for: What is TypeScript?
 TypeScript is a strongly typed programming language that builds on JavaScript by adding static typing[1][2]. Key features include:
 
 - Static type checking at compile time to catch errors early[4]
