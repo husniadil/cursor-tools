@@ -19,6 +19,6 @@ Bun.serve({
       return new Response('500 Internal Server Error', { status: 500 });
     }
   }
-}).then(() => {
-  console.log(`Server is running on http://localhost:${port}`);
 });
+
+console.log(`Server is running on http://localhost:${port}`);
