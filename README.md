@@ -133,7 +133,7 @@ Note: in most cases you can say "ask Perplexity" instead of "use cursor-tools we
 Note: in most cases you can say "ask Gemini" instead of "use cursor-tools repo" and it will work the same.
 
 ### Use doc generation
-"Use cursor-tools to generate documentation for the Github repo https://github.com/kait-http/kaito" and write it to docs/kaito.md"
+"Use cursor-tools to generate documentation for the Github repo https://github.com/kaito-http/kaito" and write it to docs/kaito.md"
 
 Note: in most cases you can say "generate documentation" instead of "use cursor-tools doc" and it will work the same.
 
@@ -150,7 +150,7 @@ Note: in most cases you can say "fetch issue 123" or "fetch PR 321" instead of "
 1. **Interactive Setup**: Run `cursor-tools install` and follow the prompts
 2. **Manual Setup**: Create `~/.cursor-tools/.env` in your home directory or `.cursor-tools.env` in your project root:
    ```env
-   OPENROUTER_API_KEY="your-perplexity-api-key"
+   OPENROUTER_API_KEY="your-openrouter-api-key"
    ```
 
 

@@ -45,7 +45,7 @@
 2.  **Manual Setup**: Create `.cursor-tools.env` in your project root, or `~/.cursor-tools/.env` in home directory:
 
     ```
-    OPENROUTER_API_KEY="your-perplexity-api-key"
+    OPENROUTER_API_KEY="your-openrouter-api-key"
     ```
 
 ### Default Settings
